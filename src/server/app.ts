@@ -1,8 +1,10 @@
 import { z, ZodError } from "zod";
 import {
+  getDb,
   HttpError,
   httpErrorResponse,
   notFound,
+  toAppLocale,
   reportError,
   telegramActionSecret,
   telegramSender,
@@ -49,6 +51,15 @@ const notifyBody = z
   })
   .strict();
 const unsubscribeBody = z.object({ token: z.string().min(1).max(2000) }).strict();
+const deliverBody = z
+  .object({
+    userId: z.string().uuid(),
+    type: z.string().max(64),
+    locale: z.string().max(8),
+    payload: z.record(z.string(), z.unknown()),
+    emailPayload: z.record(z.string(), z.unknown()).optional(),
+  })
+  .strict();
 
 const MAX_BODY = 64 * 1024;
 
@@ -150,6 +161,27 @@ function routes(config: AppConfig): Route[] {
           input.email === undefined ? undefined : { email: input.email },
         );
         return { ok: true };
+      },
+    },
+    {
+      method: "POST",
+      pattern: /^\/v1\/deliver$/,
+      run: async (request) => {
+        const input = await parseBody(request, deliverBody);
+        if (!notifications.isNotificationType(input.type)) {
+          throw validationError({ type: "unknown notification type" });
+        }
+        const type = input.type;
+        return getDb().transaction((tx) =>
+          notifications.deliverInTransaction(tx, {
+            userId: input.userId,
+            type,
+            locale: toAppLocale(input.locale),
+            payload: input.payload,
+            emailPayload: input.emailPayload,
+            now: new Date(),
+          }),
+        );
       },
     },
     {

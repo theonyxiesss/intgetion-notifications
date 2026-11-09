@@ -1,13 +1,14 @@
 {
   "name": "@intgetion/notifications",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Notification core for INTGETION JOB LIST: in-app inbox, email outbox via Resend, Telegram delivery, preferences, unsubscribe.",
   "license": "UNLICENSED",
   "type": "module",
   "exports": {
     ".": "./src/modules/notifications/service/index.ts",
     "./ports": "./src/ports.ts",
-    "./server": "./src/server/app.ts"
+    "./server": "./src/server/app.ts",
+    "./db": "./src/db/notifications-schema.ts"
   },
   "scripts": {
     "dev": "tsx watch src/server/main.ts",

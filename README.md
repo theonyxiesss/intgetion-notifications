@@ -35,6 +35,7 @@ Every request except `GET /health` needs `Authorization: Bearer <NOTIFICATIONS_S
 | PUT | `/v1/me/preferences` | person | `{ items: [{ type, channel, enabled }] }` |
 | POST | `/v1/unsubscribe` | link | `{ token }` from an email; turns that email type off |
 | POST | `/v1/notify` | module | `{ type, recipientIds, payload, email? }`; payload checked against the type |
+| POST | `/v1/deliver` | module | `{ userId, type, locale, payload, emailPayload? }` → one scheduled notice by the person's preferences (briefs) |
 | GET | `/v1/jobs/:id/expiring-notice` | module | `{ sent }` — was `job.expiring` already sent |
 | POST | `/v1/tasks/dispatch-emails` | scheduler | send due emails, drop old read notices |
 | POST | `/v1/tasks/dispatch-telegram` | scheduler | push allowed notices to linked Telegram accounts |
